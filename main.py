@@ -1,13 +1,23 @@
+import json
+import os
+import re
+import sys
+from tkinter import filedialog, messagebox, simpledialog
+
 import customtkinter as ctk
-from tkinter import filedialog, messagebox
-import os, re, json, sys
-from tkinter import simpledialog
+from customtkinter import CTkImage, CTkLabel
+from PIL import Image
 
 # ---------- Определяем путь программы ----------
 if getattr(sys, 'frozen', False):
     BASE_DIR = os.path.dirname(sys.executable)
 else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.abspath(relative_path)
 
 APP_NAME = os.path.basename(BASE_DIR)
 CONFIG_PATH = os.path.join(BASE_DIR, "config", "settings.json")
@@ -222,6 +232,7 @@ ctk.set_default_color_theme("green")
 
 root = ctk.CTk()
 root.title(f"HOI4 Modding Tool — {APP_NAME} — by 💢🖤Schrödinger's Cutie🖤👾")
+root.iconbitmap(resource_path("assets/logo.ico"))
 root.geometry("750x480")
 
 game_path_var = ctk.StringVar(value=load_settings())
@@ -235,9 +246,20 @@ font_entry = ("Arial", 13)
 frame = ctk.CTkFrame(root, corner_radius=12)
 frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-ctk.CTkLabel(frame, text="HOI4 Modding Tool", font=("Arial", 20, "bold")).grid(row=0, column=0, columnspan=3, pady=(10, 5))
-ctk.CTkLabel(frame, text="by 💢🖤Schrödinger's Cutie🖤👾", font=("Arial", 12, "italic")).grid(row=1, column=0, columnspan=3, pady=(0, 15))
 
+# Загрузка логотипа
+logo_image = Image.open(resource_path("assets/logo.ico")).convert("RGBA")
+logo_image = logo_image.resize((100, 100), Image.Resampling.LANCZOS)
+
+logo_ctk_image = CTkImage(light_image=logo_image, dark_image=logo_image, size=(100, 100))
+
+# Отображаем в интерфейсе
+ctk_label = CTkLabel(frame, image=logo_ctk_image, text="")
+ctk_label.grid(row=0, column=0, columnspan=3, pady=(10, 5))
+
+
+ctk.CTkLabel(frame, text="HOI4 Modding Tool", font=("Arial", 20, "bold")).grid(row=1, column=0, columnspan=3, pady=(10, 5))
+ctk.CTkLabel(frame, text="by 💢🖤Schrödinger's Cutie🖤👾", font=("Arial", 12, "italic")).grid(row=2, column=0, columnspan=3, pady=(0, 15))
 # Путь к игре
 ctk.CTkLabel(frame, text="Путь к игре:", font=font_label).grid(row=2, column=0, sticky="w", padx=10, pady=5)
 ctk.CTkEntry(frame, textvariable=game_path_var, width=450, font=font_entry).grid(row=2, column=1, pady=5)
